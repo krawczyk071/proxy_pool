@@ -114,3 +114,126 @@ After starting the web service, the default configuration enables an API service
 
 For further details, refer to the full translated document.
 
+Using Proxy in a Crawler
+
+To use this API in a crawler script, you can wrap it in a function like this:
+
+import requests
+
+def get_proxy():
+    return requests.get("http://127.0.0.1:5010/get/").json()
+
+def delete_proxy(proxy):
+    requests.get("http://127.0.0.1:5010/delete/?proxy={}".format(proxy))
+
+# Your spider code
+
+def getHtml():
+    retry_count = 5
+    proxy = get_proxy().get("proxy")
+    while retry_count > 0:
+        try:
+            html = requests.get('http://www.example.com', proxies={"http": "http://{}".format(proxy)})
+            return html
+        except Exception:
+            retry_count -= 1
+    delete_proxy(proxy)
+    return None
+
+Extending Proxy Sources
+
+The project includes several free proxy sources, but their quality may vary. You can extend proxy sources by following these steps:
+
+Add a static method in ProxyFetcher to return proxies in host:ip format using a generator:
+
+class ProxyFetcher(object):
+    # Custom proxy source method
+    @staticmethod
+    def freeProxyCustom1():
+        proxies = ["x.x.x.x:3128", "x.x.x.x:80"]
+        for proxy in proxies:
+            yield proxy
+
+Update setting.py by adding your custom method to PROXY_FETCHER:
+
+PROXY_FETCHER = [
+    "freeProxy01",    
+    "freeProxy02",
+    "freeProxyCustom1"
+]
+
+Free Proxy Sources
+
+Currently, the project includes these free proxy sources:
+
+Proxy Name
+
+Status
+
+Update Speed
+
+Availability
+
+Code
+
+站大爷
+
+✔
+
+★
+
+**
+
+freeProxy01
+
+66代理
+
+✔
+
+★
+
+*
+
+freeProxy02
+
+开心代理
+
+✔
+
+★
+
+*
+
+freeProxy03
+
+FreeProxyList
+
+✔
+
+★
+
+*
+
+freeProxy04
+
+快代理
+
+✔
+
+★
+
+*
+
+freeProxy05
+
+Issues & Feedback
+
+Feel free to report issues in the Issues section or leave a comment on my blog. Your feedback helps improve this project.
+
+Contributors
+
+Thanks to all the contributors for their efforts: @kangnwh, @bobobo80, @halleywj, @newlyedward, @wang-ye, @gladmo, and many more.
+
+Release Notes
+
+Check the changelog for updates and new features.
