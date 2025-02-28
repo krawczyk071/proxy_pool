@@ -17,6 +17,8 @@ import re
 import json
 from time import sleep
 
+from bs4 import BeautifulSoup
+
 from util.webRequest import WebRequest
 
 
@@ -314,6 +316,7 @@ class ProxyFetcher(object):
             'https://raw.githubusercontent.com/zloi-user/hideip.me/main/https.txt',
             'https://raw.githubusercontent.com/ErcinDedeoglu/proxies/main/proxies/http.txt',
             'https://raw.githubusercontent.com/ErcinDedeoglu/proxies/main/proxies/https.txt',
+            "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/all.txt",
             'https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/protocols/http/data.txt',
 
             ]
@@ -351,6 +354,82 @@ class ProxyFetcher(object):
 
         for proxy in proxy_dict['http'] :
             yield proxy
+    @staticmethod
+    def freeProxyCustom6():
+        target_urls = [f"https://freeproxy.lunaproxy.com/page/{i}.html" for i in range (1,2)]
+        #duplicates on all pages
+        proxies = []
+
+        for url in target_urls:
+            text = WebRequest().get(url).text
+
+            soup = BeautifulSoup(text, "html.parser")
+            table = soup.find("div", attrs={"class": "list"})
+            for row in table.find_all("div"):
+                count = 0
+                proxy = ""
+                for cell in row.find_all("div", attrs={"class": "td"}):
+                    if count == 2:
+                        break
+                    proxy += cell.text+":"
+                    count += 1
+                proxy = proxy.rstrip(":")
+                if proxy != "":
+                    proxies.append(proxy)
+
+        proxy_list = list(set(proxies))
+        for proxy in proxy_list:
+            yield proxy
+            
+    @staticmethod
+    def freeProxyCustom7():
+        target_urls = [
+            'http://sslproxies.org',
+            'http://free-proxy-list.net',
+            "http://us-proxy.org",
+            "http://socks-proxy.net",
+            
+            ]
+        proxies = set()
+
+        for url in target_urls:
+            text = WebRequest().get(url).text
+
+            soup = BeautifulSoup(text, "html.parser")
+            table = soup.find("table", attrs={"class": "table table-striped table-bordered"})
+            for row in table.find_all("tr"):
+                count = 0
+                proxy = ""
+                for cell in row.find_all("td"):
+                    if count == 1:
+                        proxy += ":" + cell.text.replace("&nbsp;", "")
+                        proxies.add(proxy)
+                        break
+                    proxy += cell.text.replace("&nbsp;", "")
+                    count += 1
+
+        proxy_list = list(proxies)  
+        print(len(proxy_list))
+        for proxy in proxy_list:
+            yield proxy
+
+    @staticmethod
+    def freeProxyCustom8():
+        target_urls = []
+        methods=['http','https']
+        anons=['elite','anonymous','transparent']
+        for method in methods:
+            for anon in anons:
+                url = f"https://www.proxy-list.download/api/v1/get?type={method}&anon={anon}"
+                target_urls.append(url)
+        proxy_list = []
+        for url in target_urls:
+            text = WebRequest().get(url).text
+            proxy_list += re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{2,5}",text)
+            proxy_list = list(set(proxy_list))
+        for proxy in proxy_list:
+            yield proxy 
+
 
 if __name__ == '__main__':
     p = ProxyFetcher()
@@ -359,5 +438,4 @@ if __name__ == '__main__':
 
 # http://nntime.com/proxy-list-01.htm
 
-# https://github.com/iw4p/proxy-scraper/blob/master/proxyScraper.py
 # https://github.com/gitrecon1455/ProxyScraper/blob/main/scraper.py

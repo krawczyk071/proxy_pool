@@ -61,7 +61,10 @@ PROXY_FETCHER = [
     "freeProxyCustom2",
     "freeProxyCustom3",
     "freeProxyCustom4",
-    "freeProxyCustom5"
+    "freeProxyCustom5",
+    "freeProxyCustom6",
+    "freeProxyCustom7",
+    "freeProxyCustom8",
     
 ]
 

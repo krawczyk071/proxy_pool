@@ -2,6 +2,7 @@ import datetime
 from util.webRequest import WebRequest
 from fetcher.proxyFetcher import ProxyFetcher
 import re
+from bs4 import BeautifulSoup
 
 def freeProxy03():
     target_urls = ["http://www.kxdaili.com/dailiip.html", "http://www.kxdaili.com/dailiip/2/1.html"]
@@ -92,6 +93,96 @@ def freeProxy13():
 # sources
 # https://github.com/MuRongPIG/Proxy-Master/blob/main/getproxy.py
 
+
+def freeProxyCustom7():
+    target_urls = [
+        'https://raw.githubusercontent.com/aslisk/proxyhttps/main/https.txt',
+        'https://raw.githubusercontent.com/saisuiu/uiu/main/free.txt',
+        'https://raw.githubusercontent.com/berkay-digital/Proxy-Scraper/main/proxies.txt',
+        'https://raw.githubusercontent.com/MrMarble/proxy-list/main/all.txt'
+        ]
+    proxy_list = []
+    for url in target_urls:
+        text = WebRequest().get(url).text
+        proxy_list += re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{2,5}",text)
+        proxy_list = list(set(proxy_list))
+    for proxy in proxy_list:
+        yield proxy
+        
+def freeProxyCustom7div():
+    target_urls = [f"https://freeproxy.lunaproxy.com/page/{i}.html" for i in range (1,2)]
+    #duplicates on all pages
+    proxies = []
+
+    for url in target_urls:
+        text = WebRequest().get(url).text
+
+        soup = BeautifulSoup(text, "html.parser")
+        table = soup.find("div", attrs={"class": "list"})
+        for row in table.find_all("div"):
+            count = 0
+            proxy = ""
+            for cell in row.find_all("div", attrs={"class": "td"}):
+                if count == 2:
+                    break
+                proxy += cell.text+":"
+                count += 1
+            proxy = proxy.rstrip(":")
+            if proxy != "":
+                proxies.append(proxy)
+
+    proxy_list = list(set(proxies))
+    for proxy in proxy_list:
+        yield proxy
+
+def freeProxyCustom7table():
+    target_urls = [
+        'http://sslproxies.org',
+        'http://free-proxy-list.net',
+        "http://us-proxy.org",
+        "http://socks-proxy.net",
+        
+        ]
+    proxies = set()
+
+    for url in target_urls:
+        text = WebRequest().get(url).text
+
+        soup = BeautifulSoup(text, "html.parser")
+        table = soup.find("table", attrs={"class": "table table-striped table-bordered"})
+        for row in table.find_all("tr"):
+            count = 0
+            proxy = ""
+            for cell in row.find_all("td"):
+                if count == 1:
+                    proxy += ":" + cell.text.replace("&nbsp;", "")
+                    proxies.add(proxy)
+                    break
+                proxy += cell.text.replace("&nbsp;", "")
+                count += 1
+
+    proxy_list = list(proxies)  
+    print(len(proxy_list))
+    for proxy in proxy_list:
+        yield proxy
+
+def freeProxyCustom7url():
+    target_urls = []
+    methods=['http','https']
+    anons=['elite','anonymous','transparent']
+    for method in methods:
+        for anon in anons:
+            url = f"https://www.proxy-list.download/api/v1/get?type={method}&anon={anon}"
+            target_urls.append(url)
+    proxy_list = []
+    for url in target_urls:
+        text = WebRequest().get(url).text
+        proxy_list += re.findall(r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}:\d{2,5}",text)
+        proxy_list = list(set(proxy_list))
+    for proxy in proxy_list:
+        yield proxy 
+
+        
 def get_extra():
     proxy_dict={'socks4':[],'socks5':[],'http':[]}
     for q in range(20):
@@ -121,7 +212,7 @@ def get_extra():
         yield proxy
     # return proxy_dict['http']
 
-y = get_extra()
+y = freeProxyCustom7div()
 y = next(y)
 
 print(y)
