@@ -182,7 +182,32 @@ def freeProxyCustom7url():
     for proxy in proxy_list:
         yield proxy 
 
+def freeProxyCustom9():
+    target_urls = ["https://proxy11.com"
         
+        ]
+    proxies = []
+
+    for url in target_urls:
+        text = WebRequest().get(url).text
+
+        soup = BeautifulSoup(text, "html.parser")
+        tbody = soup.find("tbody")
+        tr = tbody.find_all("tr")
+
+        for td in tr:
+            tds = td.find_all("td")
+            ip = tds[0].text
+            port = tds[1].text
+            px= f"{ip}:{port}"
+            proxies.append(px)
+
+    proxy_list = list(set(proxies))  
+    for proxy in proxy_list:
+        yield proxy
+
+
+
 def get_extra():
     proxy_dict={'socks4':[],'socks5':[],'http':[]}
     for q in range(20):
@@ -212,7 +237,7 @@ def get_extra():
         yield proxy
     # return proxy_dict['http']
 
-y = freeProxyCustom7div()
+y = freeProxyCustom9()
 y = next(y)
 
 print(y)

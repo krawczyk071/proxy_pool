@@ -277,7 +277,7 @@ class ProxyFetcher(object):
             'https://proxyspace.pro/https.txt',
             "https://sunny9577.github.io/proxy-scraper/generated/http_proxies.txt",
             'https://cdn.rei.my.id/proxy/HTTP',
-            
+            'http://www.proxylists.net/http_highanon.txt'            
             ]
         proxy_list = []
         for url in target_urls:
@@ -386,6 +386,7 @@ class ProxyFetcher(object):
         target_urls = [
             'http://sslproxies.org',
             'http://free-proxy-list.net',
+            "https://free-proxy-list.net/uk-proxy.html",
             "http://us-proxy.org",
             "http://socks-proxy.net",
             
@@ -408,8 +409,7 @@ class ProxyFetcher(object):
                     proxy += cell.text.replace("&nbsp;", "")
                     count += 1
 
-        proxy_list = list(proxies)  
-        print(len(proxy_list))
+        proxy_list = list(proxies) 
         for proxy in proxy_list:
             yield proxy
 
@@ -430,6 +430,30 @@ class ProxyFetcher(object):
         for proxy in proxy_list:
             yield proxy 
 
+    @staticmethod
+    def freeProxyCustom9():
+        target_urls = ["https://proxy11.com"
+            
+            ]
+        proxies = []
+
+        for url in target_urls:
+            text = WebRequest().get(url).text
+
+            soup = BeautifulSoup(text, "html.parser")
+            tbody = soup.find("tbody")
+            tr = tbody.find_all("tr")
+
+            for td in tr:
+                tds = td.find_all("td")
+                ip = tds[0].text
+                port = tds[1].text
+                px= f"{ip}:{port}"
+                proxies.append(px)
+
+        proxy_list = list(set(proxies))  
+        for proxy in proxy_list:
+            yield proxy
 
 if __name__ == '__main__':
     p = ProxyFetcher()
